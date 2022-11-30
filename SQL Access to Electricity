@@ -1,0 +1,103 @@
+SELECT Location, Year, Number_with_access_to_electricity, Number_without_electricity FROM personal_project.people_with_and_without_electricity;
+
+/*Find which region had the most people without access to electricity in africa */
+/*Looking at the highest number without electruicty */
+
+SELECT *, max(Number_without_electricity) AS RegionWithOutElectricity
+	FROM personal_project.number_without_electricity_by_region
+	WHERE location IN ('Sub-Saharan Africa', 'Africa Eastern and Southern', 'Africa Western and Central', 'Middle East & North Africa') 
+    GROUP BY 1,2
+	order by 1,2;
+    
+    /*looking at population of each region */
+    SELECT Location, Year, Number_with_access_to_electricity, Number_without_electricity,
+	(Number_with_access_to_electricity + Number_without_electricity)
+	as Total_population FROM personal_project.people_with_and_without_electricity
+	WHERE location IN ('Sub-Saharan Africa', 'Africa Eastern and Southern', 'Africa Western and Central', 'Middle East & North Africa') 
+	order by 1,2;
+    
+    /*Looking at the percentages of regions with and without electricity*/
+    
+    SELECT Location, Year, (Number_without_electricity/Total_population)*100 AS Percentage_without_electricity,
+	(Number_with_access_to_electricity/Total_population)*100 AS percentage_with_access
+	FROM
+	(SELECT Location, Year, Number_with_access_to_electricity, Number_without_electricity,
+	(Number_with_access_to_electricity + Number_without_electricity)
+	AS Total_population FROM personal_project.people_with_and_without_electricity
+	WHERE location IN ('Sub-Saharan Africa', 'Africa Eastern and Southern', 'Africa Western and Central', 'Middle East & North Africa') 
+	order by 4 desc) as a;
+    
+/*Looking at the changes to people with access to electricity in 19 years.*/
+/*Population without electricity by for Zimbabwe*/
+
+SELECT location, Year, Number_without_access_to_electricity
+	FROM personal_project.people_without_electricity_country
+	WHERE location LIKE 'Zim%'AND YEAR BETWEEN 2000 AND 2019;
+
+/* Calcualting the total population of Zimbabwe over 19 years*/ 
+
+SELECT Location, Year, Number_with_access_to_electricity, Number_without_electricity,
+	(Number_with_access_to_electricity + Number_without_electricity)
+	as Total_population FROM personal_project.people_with_and_without_electricity
+	WHERE location = 'Zimbabwe'
+	AND YEAR BETWEEN 2000 AND 2019
+	order by 1,2;
+
+/*looking at the percentage of people with accessout to electricity.*/
+/*calculating the percentage of people withOUT access to electricity */
+
+SELECT Location, Year, (Number_without_electricity/Total_population)*100 AS Percentage_without_electricity,
+	(Number_with_access_to_electricity/Total_population)*100 AS percentage_with_access
+	FROM
+	(SELECT Location, Year, Number_with_access_to_electricity, Number_without_electricity,
+	(Number_with_access_to_electricity + Number_without_electricity)
+	AS Total_population FROM personal_project.people_with_and_without_electricity
+	WHERE location = 'Zimbabwe' AND YEAR BETWEEN 2000 AND 2019
+	order by 4 desc) as a;
+    
+/*Looking at the highest without access to electricity compared to population in the world */
+SELECT Location, Year, max(Number_without_electricity) AS HighestWithout,
+(Number_without_electricity/Total_population)*100 AS PercentageWithout
+	FROM
+	(SELECT Location, Year, Number_with_access_to_electricity, Number_without_electricity,
+	(Number_with_access_to_electricity + Number_without_electricity)
+	AS Total_population FROM personal_project.people_with_and_without_electricity
+    WHERE location != 'world'
+   ) as b;
+
+ /* Looking at the Index for rural and urban access to electricity */
+ 
+SELECT Location, Year, Access_to_electricity_rural_Percentage_of_rural_population, Access_to_electricity_urban_Percentage_of_urban_population,
+	CASE WHEN Access_to_electricity_rural_Percentage_of_rural_population < 50 THEN 'Low'
+	WHEN Access_to_electricity_rural_Percentage_of_rural_population BETWEEN 59 AND 50 THEN 'Moderate'
+	WHEN Access_to_electricity_rural_Percentage_of_rural_population BETWEEN 60 AND 75 THEN 'High'
+	WHEN Access_to_electricity_rural_Percentage_of_rural_population >=70 THEN 'Severe'
+	END AS Rural_Index,
+CASE WHEN Access_to_electricity_urban_Percentage_of_urban_population < 50 THEN 'Low'
+WHEN Access_to_electricity_urban_Percentage_of_urban_population BETWEEN 59 AND 50 THEN 'Moderate'
+WHEN Access_to_electricity_urban_Percentage_of_urban_population BETWEEN 60 AND 75 THEN 'High'
+WHEN Access_to_electricity_urban_Percentage_of_urban_population >=70 THEN 'Very High'
+END AS Urban_Index
+	FROM personal_project.share_of_rural_population_with_electricity
+	WHERE Location = 'Zimbabwe' AND year >= 2000;
+
+/*Looking  10 countries that have the highest Per Capita for electricity*/
+SELECT location, Year, max(Per_capita_electricity_kWh) AS Hightest_per_capita 
+	FROM personal_project.electricity_generation
+	GROUP BY 1,2
+	HAVING max(Per_capita_electricity_kWh) > 2500;
+    
+    
+    
+    
+    
+    
+    
+	
+
+
+
+
+
+
+
